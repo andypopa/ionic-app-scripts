@@ -1,0 +1,165 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const fs = require("fs");
+const path_1 = require("path");
+const upgradeScript = require("./add-default-ngmodules");
+const deeplinkUtils = require("../deep-linking/util");
+const file_cache_1 = require("../util/file-cache");
+const globUtil = require("../util/glob-util");
+const helpers = require("../util/helpers");
+describe('add default ngmodules upgrade script', () => {
+    describe('getTsFilePaths', () => {
+        it('should return a list of absolute file paths', () => {
+            const srcDirectory = path_1.join('Users', 'noone', 'this', 'path', 'is', 'fake', 'src');
+            const context = {
+                srcDir: srcDirectory
+            };
+            const knownFileOne = path_1.join(srcDirectory, 'pages', 'page-one', 'page-one.ts');
+            const knownFileTwo = path_1.join(srcDirectory, 'pages', 'page-two', 'page-two.ts');
+            const knownFileThree = path_1.join(srcDirectory, 'pages', 'page-three', 'page-three.ts');
+            const knownFileFour = path_1.join(srcDirectory, 'util', 'some-util.ts');
+            const globResults = [
+                { absolutePath: knownFileOne },
+                { absolutePath: knownFileTwo },
+                { absolutePath: knownFileThree },
+                { absolutePath: knownFileFour },
+            ];
+            spyOn(globUtil, globUtil.globAll.name).and.returnValue(Promise.resolve(globResults));
+            const promise = upgradeScript.getTsFilePaths(context);
+            return promise.then((filePaths) => {
+                expect(filePaths.length).toEqual(4);
+                expect(filePaths[0]).toEqual(knownFileOne);
+                expect(filePaths[1]).toEqual(knownFileTwo);
+                expect(filePaths[2]).toEqual(knownFileThree);
+                expect(filePaths[3]).toEqual(knownFileFour);
+            });
+        });
+    });
+    describe('readTsFiles', () => {
+        it('should read the ts files', () => {
+            const context = {
+                fileCache: new file_cache_1.FileCache()
+            };
+            const srcDirectory = path_1.join('Users', 'noone', 'this', 'path', 'is', 'fake', 'src');
+            const knownFileOne = path_1.join(srcDirectory, 'pages', 'page-one', 'page-one.ts');
+            const knownFileTwo = path_1.join(srcDirectory, 'pages', 'page-two', 'page-two.ts');
+            const knownFileThree = path_1.join(srcDirectory, 'pages', 'page-three', 'page-three.ts');
+            const knownFileFour = path_1.join(srcDirectory, 'util', 'some-util.ts');
+            const fileList = [knownFileOne, knownFileTwo, knownFileThree, knownFileFour];
+            spyOn(helpers, helpers.readFileAsync.name).and.callFake((filePath) => {
+                // just set the file content to the path name + 'content' to keep things simple
+                return Promise.resolve(filePath + 'content');
+            });
+            const promise = upgradeScript.readTsFiles(context, fileList);
+            return promise.then(() => {
+                // the files should be cached now
+                const fileOne = context.fileCache.get(knownFileOne);
+                expect(fileOne.content).toEqual(knownFileOne + 'content');
+                const fileTwo = context.fileCache.get(knownFileTwo);
+                expect(fileTwo.content).toEqual(knownFileTwo + 'content');
+                const fileThree = context.fileCache.get(knownFileThree);
+                expect(fileThree.content).toEqual(knownFileThree + 'content');
+                const fileFour = context.fileCache.get(knownFileFour);
+                expect(fileFour.content).toEqual(knownFileFour + 'content');
+            });
+        });
+    });
+    describe('generateAndWriteNgModules', () => {
+        it('should generate NgModules for only the pages with deeplink decorator AND if the module.ts file doesnt exist', () => {
+            const srcDirectory = path_1.join('Users', 'noone', 'this', 'path', 'is', 'fake', 'src');
+            const knownFileOne = path_1.join(srcDirectory, 'pages', 'page-one', 'page-one.ts');
+            const knownFileTwo = path_1.join(srcDirectory, 'pages', 'page-two', 'page-two.ts');
+            const knownFileThree = path_1.join(srcDirectory, 'pages', 'page-three', 'page-three.ts');
+            const knownFileThreeModule = path_1.join(srcDirectory, 'pages', 'page-three', 'page-three.module.ts');
+            const knownFileFour = path_1.join(srcDirectory, 'util', 'some-util.ts');
+            const knownFileFive = path_1.join(srcDirectory, 'pages', 'page-three', 'provider.ts');
+            const knownFileSix = path_1.join(srcDirectory, 'modals', 'modal-one', 'modal-one.ts');
+            const context = {
+                fileCache: new file_cache_1.FileCache()
+            };
+            context.fileCache.set(knownFileOne, { path: knownFileOne, content: getClassContent('PageOne', 'page-one') });
+            context.fileCache.set(knownFileTwo, { path: knownFileTwo, content: getClassContent('PageTwo', 'page-two') });
+            context.fileCache.set(knownFileThree, { path: knownFileThree, content: getClassContent('PageThree', 'page-three') });
+            context.fileCache.set(knownFileThreeModule, { path: knownFileThreeModule, content: deeplinkUtils.generateDefaultDeepLinkNgModuleContent(knownFileThree, 'PageThree') });
+            context.fileCache.set(knownFileFour, { path: knownFileFour, content: `${knownFileFour} content` });
+            context.fileCache.set(knownFileFive, { path: knownFileFive, content: `${knownFileFive} content` });
+            context.fileCache.set(knownFileSix, { path: knownFileSix, content: getClassContent('ModalOne', 'modal-one') });
+            const ngModuleFileExtension = '.module.ts';
+            const knownNgModulePageOne = `
+import { NgModule } from '@angular/core';
+import { IonicPageModule } from 'ionic-angular';
+import { PageOne } from './page-one';
+
+@NgModule({
+  declarations: [
+    PageOne,
+  ],
+  imports: [
+    IonicPageModule.forChild(PageOne)
+  ]
+})
+export class PageOneModule {}
+
+`;
+            const knownNgModulePageTwo = `
+import { NgModule } from '@angular/core';
+import { IonicPageModule } from 'ionic-angular';
+import { PageTwo } from './page-two';
+
+@NgModule({
+  declarations: [
+    PageTwo,
+  ],
+  imports: [
+    IonicPageModule.forChild(PageTwo)
+  ]
+})
+export class PageTwoModule {}
+
+`;
+            const knownNgModuleModalPage = `
+import { NgModule } from '@angular/core';
+import { IonicPageModule } from 'ionic-angular';
+import { ModalOne } from './modal-one';
+
+@NgModule({
+  declarations: [
+    ModalOne,
+  ],
+  imports: [
+    IonicPageModule.forChild(ModalOne)
+  ]
+})
+export class ModalOneModule {}
+
+`;
+            spyOn(helpers, helpers.getStringPropertyValue.name).and.returnValue(ngModuleFileExtension);
+            const fsSpy = spyOn(fs, 'writeFileSync');
+            upgradeScript.generateAndWriteNgModules(context.fileCache);
+            expect(fsSpy.calls.count()).toEqual(3);
+            expect(fsSpy.calls.argsFor(0)[0]).toEqual(helpers.changeExtension(knownFileOne, ngModuleFileExtension));
+            expect(fsSpy.calls.argsFor(0)[1]).toEqual(knownNgModulePageOne);
+            expect(fsSpy.calls.argsFor(1)[0]).toEqual(helpers.changeExtension(knownFileTwo, ngModuleFileExtension));
+            expect(fsSpy.calls.argsFor(1)[1]).toEqual(knownNgModulePageTwo);
+            expect(fsSpy.calls.argsFor(2)[0]).toEqual(helpers.changeExtension(knownFileSix, ngModuleFileExtension));
+            expect(fsSpy.calls.argsFor(2)[1]).toEqual(knownNgModuleModalPage);
+        });
+    });
+});
+function getClassContent(className, folderName) {
+    return `
+import { Component } from '@angular/core';
+import { IonicPage, NavController } from 'ionic-angular';
+
+@IonicPage()
+@Component({
+  selector: '${folderName}',
+  templateUrl: './${folderName}.html'
+})
+export class ${className} {
+
+  constructor(public navCtrl: NavController) {}
+
+}
+`;
+}
