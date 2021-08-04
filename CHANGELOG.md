@@ -1,3 +1,9 @@
+<a name="3.2.5"></a>
+## [3.2.5](https://github.com/andypopa/ionic-app-scripts/compare/v3.2.4...v3.2.5) (2021-08-04)
+* Updated chokidar to 3.5.2 to prevent 404 on downloading fsevents binary which leads to slow npm install
+* Updated node-sass to 6.0.1 to prevent 404 on downloading binary which leads to slow npm install
+
+
 <a name="3.2.4"></a>
 ## [3.2.4](https://github.com/ionic-team/ionic-app-scripts/compare/v3.2.3...v3.2.4) (2019-05-24)
 

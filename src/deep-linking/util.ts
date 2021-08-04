@@ -445,7 +445,7 @@ export function purgeDeepLinkDecoratorTSTransformImpl(transformContext: Transfor
         }
       });
       const emptyNamedImports = createNamedImports(importSpecifiers);
-      const newImportClause = updateImportClause(importDeclaration.importClause, importDeclaration.importClause.name, emptyNamedImports);
+      const newImportClause = updateImportClause(importDeclaration.importClause, importDeclaration.importClause.name, emptyNamedImports, false);
 
       return updateImportDeclaration(
         importDeclaration,

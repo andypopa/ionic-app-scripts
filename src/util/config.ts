@@ -423,7 +423,7 @@ export function fillConfigDefaults(userConfigFile: string, defaultConfigFile: st
 
   // create a fresh copy of the config each time
   // always assign any default values which were not already supplied by the user
-  return objectAssign({}, defaultConfig, userConfig);
+  return Object.assign({}, defaultConfig, userConfig);
 }
 
 export function bundlerStrategy(context: BuildContext): string {

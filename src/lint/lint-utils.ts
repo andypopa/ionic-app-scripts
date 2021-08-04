@@ -54,7 +54,7 @@ export function lintFile(linter: Linter, config: any, filePath: string): Promise
  * @param {BuildContext} context
  * @param {Array<Diagnostic>} tsDiagnostics
  */
-export function processTypeCheckDiagnostics(context: BuildContext, tsDiagnostics: Diagnostic[]) {
+export function processTypeCheckDiagnostics(context: BuildContext, tsDiagnostics: readonly Diagnostic[]) {
   if (tsDiagnostics.length > 0) {
     const diagnostics = runTypeScriptDiagnostics(context, tsDiagnostics);
     printDiagnostics(context, DiagnosticsType.TypeScript, diagnostics, true, false);

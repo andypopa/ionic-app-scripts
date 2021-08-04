@@ -41,7 +41,7 @@ export function getLintResult(linter: Linter): LintResult {
  * @param {LinterOptions} linterOptions
  * @return {Promise<Diagnostic[]>}
  */
-export function typeCheck(context: BuildContext, program: Program, linterOptions?: LinterOptions): Promise<Diagnostic[]> {
+export function typeCheck(context: BuildContext, program: Program, linterOptions?: LinterOptions): Promise<readonly Diagnostic[]> {
   if (isObject(linterOptions) && linterOptions.typeCheck) {
     return Promise.resolve(getPreEmitDiagnostics(program));
   }

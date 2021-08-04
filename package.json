@@ -1,9 +1,16 @@
 {
-  "name": "@ionic/app-scripts",
-  "version": "3.2.4",
+  "name": "@megakill/ionic-app-scripts",
+  "version": "3.2.5",
   "description": "Scripts for Ionic Projects",
   "homepage": "https://ionicframework.com/",
   "author": "Ionic Team <hi@ionic.io> (https://ionic.io)",
+  "contributors": [
+    {
+      "name": "Andrei Popa",
+      "email": "andypopa@gmail.com",
+      "url": "https://github.com/andypopa"
+    }
+  ],
   "license": "MIT",
   "files": [
     "bin/",
@@ -92,15 +99,15 @@
     "rxjs": "^5.5.10",
     "sw-toolbox": "^3.6.0",
     "tslint-ionic-rules": "0.0.8",
-    "typescript": "~2.4.2",
+    "typescript": "^3.9.10",
     "zone.js": "^0.8.26"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ionic-team/ionic-app-scripts.git"
+    "url": "git+https://github.com/andypopa/ionic-app-scripts.git"
   },
   "bugs": {
-    "url": "https://github.com/ionic-team/ionic-app-scripts/issues"
+    "url": "https://github.com/andypopa/ionic-app-scripts/issues"
   },
   "config": {
     "commitizen": {
