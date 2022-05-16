@@ -39,7 +39,7 @@
   "main": "dist/index.js",
   "dependencies": {
     "@angular-devkit/build-optimizer": "0.0.35",
-    "autoprefixer": "^7.2.6",
+    "autoprefixer": "^9.0.0",
     "chalk": "^2.4.0",
     "chokidar": "^3.5.2",
     "clean-css": "^4.1.11",
