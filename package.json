@@ -38,7 +38,7 @@
   },
   "main": "dist/index.js",
   "dependencies": {
-    "@angular-devkit/build-optimizer": "0.0.35",
+    "@angular-devkit/build-optimizer": "0.901.0",
     "autoprefixer": "^7.2.6",
     "chalk": "^2.4.0",
     "chokidar": "^3.5.2",
@@ -62,7 +62,7 @@
     "tslint": "^5.8.0",
     "tslint-eslint-rules": "^4.1.1",
     "uglify-es": "3.2.2",
-    "webpack": "3.12.0",
+    "webpack": "5.0.0",
     "ws": "3.3.2",
     "xml2js": "^0.4.19"
   },
